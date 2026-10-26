@@ -142,6 +142,29 @@ app.post("/api/round/advance", (req, res) => {
   });
 });
 
+app.post("/api/round/cashout", (req, res) => {
+  if (!DEMO_MODE) {
+    return res.status(403).json({
+      error: "Demo mode is disabled."
+    });
+  }
+
+  if (!round || round.status !== "running") {
+    return res.status(409).json({
+      error: "No active round.",
+      round: publicRound(round)
+    });
+  }
+
+  round.status = "cashed_out";
+  round.cashedOutAt = new Date().toISOString();
+
+  res.json({
+    round: publicRound(round),
+    cashedOut: true
+  });
+});
+      
 app.get("/api/history", (req, res) => {
   res.json({
     history,
